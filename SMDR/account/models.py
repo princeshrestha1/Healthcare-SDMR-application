@@ -66,3 +66,9 @@ class User(AbstractBaseUser, PermissionsMixin):
         "Does the user have permissions to view the app `app_label`?"
         # Simplest possible answer: Yes, always
         return True
+
+
+class Relatives(models.Model):
+    patient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='patient_user')
+    relative = models.ForeignKey(User, on_delete=models.CASCADE, related_name='relative_user')
+    created_at = models.DateTimeField(auto_now=True)

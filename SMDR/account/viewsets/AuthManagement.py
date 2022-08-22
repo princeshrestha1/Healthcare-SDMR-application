@@ -9,9 +9,9 @@ from datetime import timedelta, datetime
 import jwt
 from rest_framework_jwt.settings import api_settings
 from rest_framework import viewsets, permissions, generics, status, mixins
-from account.models import User
+from account.models import User, Relatives
 from rest_framework.schemas import SchemaGenerator
-
+from django.db.models import Q
 from rest_framework.decorators import action
 from django.db import IntegrityError
 
@@ -25,8 +25,7 @@ import os
 from django.db.models import Q
 from django.contrib.auth import authenticate
 from rest_framework.filters import SearchFilter
-from account.serializers import UserSerializer, ReadUserSerializer, LoginSerializer
-
+from account.serializers import UserSerializer, ReadUserSerializer, LoginSerializer, RelativesSerializer
 
 
 class RegisterUserView(CreateAPIView):
@@ -124,3 +123,26 @@ class VerifyDoctor(APIView):
         user.save()
         user = ReadUserSerializer(user)
         return Response(user.data, status=200)
+
+
+class RelativesViewSets(viewsets.ModelViewSet):
+    serializer_class = RelativesSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = Relatives.objects.all()
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            serializer = serializer.save(patient=request.user)
+            return Response(serializer.data)
+        return Response(serializer.errors)
+
+    def update(self, request, pk=None):
+        serializer = self.serializer_class(instance=self.get_object())
+        if serializer.is_valid():
+            serializer = serializer.save(patient=request.user)
+            return Response(serializer.data)
+        return Response(serializer.errors)
+
+    def get_queryset(self):
+        return self.queryset.filter(Q(relative=self.request.user) | Q(patient=self.request.user))

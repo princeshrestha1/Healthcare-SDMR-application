@@ -1,8 +1,6 @@
-from .models import User
+from .models import User, Relatives
 from rest_framework import serializers
-from django.contrib.auth import get_user_model
 
-User = get_user_model()
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -71,3 +69,8 @@ class ReadUserSerializer(serializers.ModelSerializer):
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField()
+
+
+class RelativesSerializer(serializers.ModelSerializer):
+    fields = "__all__"
+    model = Relatives
