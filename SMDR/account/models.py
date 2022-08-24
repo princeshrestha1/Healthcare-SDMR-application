@@ -1,10 +1,14 @@
+import os
+import uuid
+
+from django.contrib.auth.models import (AbstractBaseUser, BaseUserManager,
+                                        PermissionsMixin)
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
-from .managers import CustomUserManager
+from auditlog.registry import auditlog
 # from django.utils.translation import ugettext_lazy
 from django.utils import timezone
-import uuid
-import os
+
+from .managers import CustomUserManager
 
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -35,10 +39,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     )
 
     is_doctor = models.BooleanField(('staff status'),
-        default=False,
-        help_text=(
-            'Designates whether the q can log into this admin site.'
-        ),)
+                                    default=False,
+                                    help_text=(
+        'Designates whether the q can log into this admin site.'
+    ),)
 
     date_joined = models.DateTimeField(
         ('date joined'), default=timezone.now
@@ -68,7 +72,22 @@ class User(AbstractBaseUser, PermissionsMixin):
         return True
 
 
+
+
 class Relatives(models.Model):
-    patient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='patient_user')
-    relative = models.ForeignKey(User, on_delete=models.CASCADE, related_name='relative_user')
+    patient = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='patient_user')
+    relative = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='relative_user')
     created_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"patient= {self.patient.full_name} | relative= {self.relative.full_name}"
+
+    class Meta:
+        verbose_name = "Relative"
+        verbose_name_plural = "Relatives"
+
+
+auditlog.register(User)
+auditlog.register(Relatives)

@@ -44,3 +44,8 @@ urlpatterns = [
     path('docs/', include_docs_urls(title='SMDR API Documentation'))
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+
+admin.site.site_header = "SDMR Web Application"
+admin.site.site_title = "SDMR"
+admin.site.index_title = "SDMR"
