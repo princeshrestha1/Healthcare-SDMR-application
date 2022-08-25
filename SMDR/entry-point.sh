@@ -1,17 +1,9 @@
-#!/bin/sh
+#!/bin/bash
+# python manage.py makemigrations
+python manage.py makemigrations account --noinput
+python manage.py makemigrations appiontment --noinput
+python manage.py migrate --noinput
 
-if [ "$DATABASE" = "postgres" ]
-then
-    echo "Waiting for postgres..."
-
-    while ! nc -z $SQL_HOST $SQL_PORT; do
-      sleep 0.1
-    done
-
-    echo "PostgreSQL started"
-fi
-
-python manage.py flush --no-input
-python manage.py migrate
-
+# echo "admin" | python manage.py createsuperuser --username admin --email admin@admin.com --first_name admin
+python manage.py authconfig
 exec "$@"

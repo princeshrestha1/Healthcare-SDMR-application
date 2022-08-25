@@ -1,31 +1,21 @@
-# pull official base image
-FROM python:3.9.6-slim
+FROM python:3.10-slim-buster
 
-# set work directory
-WORKDIR /home/merin/Desktop/Projects/Healthcare-SDMR-application/SMDR
+ENV PYTHONBUFFERED 1
 
-# set environment variables
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 0
-
-# install dependencies
 RUN apt-get update \
-    && apt-get install -y \
-            && apt-get install libpq-dev gcc \
-            && apt-get install psycopg2 \ 
-            && apt-get install zlib1g-dev
+    && apt-get -y install libpq-dev gcc \
+    && pip install psycopg2
 
+RUN apt-get install -y git
+RUN apt-get install -y vim
 
-RUN pip3 install --upgrade pip
-COPY ./dev_requirements.txt .
-RUN pip3 install -r dev_requirements.txt
+WORKDIR /app
 
-COPY ./entrypoint.sh .
-RUN sed -i 's/\r$//g' /home/merin/Desktop/Projects/Healthcare-SDMR-application/SMDR/entrypoint.sh
-RUN chmod +x /home/merin/Desktop/Projects/Healthcare-SDMR-application/SMDR/entrypoint.sh
+COPY requirements.txt /app
+RUN pip install --upgrade pip
 
+RUN pip install -r requirements.txt
 
-COPY . .
+COPY . /app
 
-
-ENTRYPOINT ['/home/merin/Desktop/Projects/Healthcare-SDMR-application/SMDR/entrypoint.sh']
+RUN chmod +x entryfile.sh
